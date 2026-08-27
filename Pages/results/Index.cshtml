@@ -1,0 +1,290 @@
+﻿@page "/results"
+
+@using System.Globalization
+@using System.Net
+@using System.Text.Json
+@using System.Text.RegularExpressions
+
+@{
+    ViewData["Title"] = "Results";
+
+    var results = new List<ResultRow>();
+    var feedError = false;
+
+    try
+    {
+        using var client = new HttpClient();
+
+        client.Timeout = TimeSpan.FromSeconds(10);
+
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "Dobcross.Web/1.0 (+https://www.brassbandresults.co.uk/)");
+
+        var feedUrl =
+            "https://www.brassbandresults.co.uk/embed/band/dobcross-silver-band/results-all/2023/";
+
+        var response = await client.GetAsync(feedUrl);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var javascript = await response.Content.ReadAsStringAsync();
+
+            /*
+             * Brass Band Results supplies the embed as JavaScript
+             * which contains a JSON array passed to the callback.
+             *
+             * Extract the array between the callback's parentheses.
+             */
+            var match = Regex.Match(
+                javascript,
+                @"\(\s*(\[[\s\S]*\])\s*\)\s*;?\s*$",
+                RegexOptions.Multiline);
+
+            if (match.Success)
+            {
+                using var document =
+                    JsonDocument.Parse(match.Groups[1].Value);
+
+                foreach (var item in document.RootElement.EnumerateArray())
+                {
+                    string GetString(string name)
+                    {
+                        if (item.TryGetProperty(name, out var property))
+                        {
+                            var value = property.ValueKind == JsonValueKind.String
+                                ? property.GetString() ?? ""
+                                : property.ToString();
+
+                            return WebUtility.HtmlDecode(value);
+                        }
+
+                        return "";
+                    }
+
+                    results.Add(new ResultRow
+                    {
+                        Date = GetString("date_display"),
+                        Contest = GetString("contest_name"),
+                        Position = GetString("result"),
+                        Conductor = GetString("conductor_name"),
+                        ContestSlug = GetString("contest_slug"),
+                        DateValue = GetString("date"),
+                        ConductorSlug = GetString("conductor_slug")
+                    });
+                }
+            }
+            else
+            {
+                feedError = true;
+            }
+        }
+        else
+        {
+            feedError = true;
+        }
+    }
+    catch
+    {
+        feedError = true;
+    }
+}
+
+<main>
+
+    <section class="page-hero">
+        <div class="container">
+
+            <p class="eyebrow">Competition</p>
+
+            <h1>Contest Results</h1>
+
+            <p class="page-hero__intro">
+                A record of Dobcross Silver Band's competitive achievements.
+            </p>
+
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+
+            <p class="eyebrow">Recent Results</p>
+
+            @if (feedError)
+            {
+                <div class="empty-state">
+
+                    <h2>Results temporarily unavailable</h2>
+
+                    <p>
+                        We couldn't retrieve the latest results right now.
+                        Please try again shortly or view the full results
+                        on Brass Band Results.
+                    </p>
+
+                    <a
+                        class="button button--primary"
+                        href="https://www.brassbandresults.co.uk/bands/dobcross-silver-band"
+                        target="_blank"
+                        rel="noopener">
+                        View Full Results
+                    </a>
+
+                </div>
+            }
+            else if (!results.Any())
+            {
+                <div class="empty-state">
+
+                    <h2>No results available</h2>
+
+                    <p>
+                        There are currently no results available from
+                        Brass Band Results.
+                    </p>
+
+                    <a
+                        class="button button--primary"
+                        href="https://www.brassbandresults.co.uk/bands/dobcross-silver-band"
+                        target="_blank"
+                        rel="noopener">
+                        View Full Results
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="results-table">
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Contest</th>
+                                <th>Position</th>
+                                <th>Conductor</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var result in results)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(result.ContestSlug) &&
+                                             !string.IsNullOrWhiteSpace(result.DateValue))
+                                        {
+                                            <a
+                                                class="text-link"
+                                                href="https://www.brassbandresults.co.uk/contests/@result.ContestSlug/@result.DateValue/"
+                                                target="_blank"
+                                                rel="noopener">
+                                                @result.Date
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            @result.Date
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @result.Contest
+                                    </td>
+
+                                    <td>
+                                        @result.Position
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(result.ConductorSlug))
+                                        {
+                                            <a
+                                                class="text-link"
+                                                href="https://www.brassbandresults.co.uk/people/@result.ConductorSlug/"
+                                                target="_blank"
+                                                rel="noopener">
+                                                @result.Conductor
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            @result.Conductor
+                                        }
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="content-section__body">
+
+                    <p>
+                        Results provided by
+                        <a
+                            class="text-link"
+                            href="https://www.brassbandresults.co.uk/"
+                            target="_blank"
+                            rel="noopener">
+                            Brass Band Results
+                        </a>.
+                    </p>
+
+                    <a
+                        class="button button--primary"
+                        href="https://www.brassbandresults.co.uk/bands/dobcross-silver-band"
+                        target="_blank"
+                        rel="noopener">
+                        View Full Results
+                    </a>
+
+                </div>
+            }
+
+        </div>
+    </section>
+
+    <section class="page-cta">
+        <div class="container page-cta__inner">
+
+            <div>
+                <p class="eyebrow">Dobcross Silver Band</p>
+
+                <h2>Keep exploring.</h2>
+            </div>
+
+            <div>
+                <a
+                    class="button button--primary"
+                    href="/">
+                    Return Home
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+@functions
+{
+    public class ResultRow
+    {
+        public string Date { get; set; } = "";
+        public string Contest { get; set; } = "";
+        public string Position { get; set; } = "";
+        public string Conductor { get; set; } = "";
+        public string ContestSlug { get; set; } = "";
+        public string DateValue { get; set; } = "";
+        public string ConductorSlug { get; set; } = "";
+    }
+}

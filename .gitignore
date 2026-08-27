@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+Backups/
+*.user
+*.suo
+
+# Orchard Core runtime data
+App_Data/Sites/
+App_Data/logs/
+App_Data/tenants.json

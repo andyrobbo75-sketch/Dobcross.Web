@@ -1,0 +1,87 @@
+﻿@page "/latest-news"
+
+@using OrchardCore
+@using OrchardCore.ContentManagement
+@using OrchardCore.Title.Models
+@inject IOrchardHelper Orchard
+
+@{
+    ViewData["Title"] = "Latest News";
+
+    var newsItems = await Orchard.GetRecentContentItemsByContentTypeAsync("News", 20);
+}
+
+<main>
+
+    <section class="page-hero">
+        <div class="container">
+            <p class="eyebrow">From the Band</p>
+
+            <h1>Latest News</h1>
+
+            <p class="page-hero__intro">
+                News, announcements and updates from Dobcross Silver Band.
+            </p>
+        </div>
+    </section>
+
+    <section class="news-section">
+        <div class="container">
+
+            @if (newsItems == null || !newsItems.Any())
+            {
+                <div class="empty-state">
+                    <h2>No news yet</h2>
+
+                    <p>
+                        There are currently no published news articles.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="news-grid">
+
+                    @foreach (var item in newsItems)
+                    {
+                        if (!item.TryGet<TitlePart>(out var titlePart))
+                        {
+                            continue;
+                        }
+
+                        <article class="news-card">
+
+                            <div class="news-card__content">
+
+                                @if (item.PublishedUtc.HasValue)
+                                {
+                                    <p class="news-card__date">
+                                        @item.PublishedUtc.Value.ToLocalTime().ToString("d MMMM yyyy")
+                                    </p>
+                                }
+
+                                <h3>
+                                    @titlePart.Title
+                                </h3>
+
+                                <a class="text-link"
+                                   href="/news/@item.ContentItemId">
+                                    Read more
+                                    <span>→</span>
+                                </a>
+
+                            </div>
+
+                        </article>
+                    }
+
+                </div>
+            }
+
+        </div>
+    </section>
+
+</main>
+
+
+

@@ -1,0 +1,225 @@
+﻿@page "/events"
+
+@using OrchardCore.ContentManagement
+@using OrchardCore.ContentManagement.Records
+@using System.Globalization
+@using System.Text.Json
+@using System.Text.Json.Nodes
+@using YesSql
+
+@inject ISession Session
+
+@{
+    ViewData["Title"] = "Events";
+
+    var events = await Session
+        .Query<ContentItem, ContentItemIndex>()
+        .Where(x => x.ContentType == "Event" && x.Published)
+        .OrderBy(x => x.DisplayText)
+        .ListAsync();
+
+    string? GetEventDate(ContentItem item)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(item.Content);
+            var root = JsonNode.Parse(json);
+
+            JsonNode? FindProperty(JsonNode? node, string propertyName)
+            {
+                if (node is JsonObject obj)
+                {
+                    foreach (var property in obj)
+                    {
+                        if (string.Equals(
+                            property.Key,
+                            propertyName,
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            return property.Value;
+                        }
+
+                        var found = FindProperty(property.Value, propertyName);
+
+                        if (found != null)
+                        {
+                            return found;
+                        }
+                    }
+                }
+                else if (node is JsonArray array)
+                {
+                    foreach (var child in array)
+                    {
+                        var found = FindProperty(child, propertyName);
+
+                        if (found != null)
+                        {
+                            return found;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            var dateNode = FindProperty(root, "EventDateTime");
+
+            if (dateNode == null)
+            {
+                return null;
+            }
+
+            /*
+             * Orchard's EventDateTime field is stored as:
+             *
+             * {
+             *     "Value": "2026-09-27T13:00:00Z"
+             * }
+             *
+             * We need the Value inside the object.
+             */
+            JsonNode? valueNode = dateNode;
+
+            if (dateNode is JsonObject dateObject)
+            {
+                if (!dateObject.TryGetPropertyValue("Value", out valueNode))
+                {
+                    return null;
+                }
+            }
+
+            if (valueNode == null)
+            {
+                return null;
+            }
+
+            var raw = valueNode.ToString().Trim('"');
+
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            if (DateTimeOffset.TryParse(
+                raw,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out var parsedDate))
+            {
+                return parsedDate
+                    .ToLocalTime()
+                    .ToString(
+                        "dddd d MMMM yyyy 'at' h:mm tt",
+                        CultureInfo.InvariantCulture);
+            }
+
+            return raw;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}
+
+<main>
+
+    <section class="page-hero">
+        <div class="container">
+
+            <p class="eyebrow">What's On</p>
+
+            <h1>Upcoming Events</h1>
+
+            <p class="page-hero__intro">
+                Find out where you can hear Dobcross Silver Band.
+            </p>
+
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+
+            <p class="eyebrow">Band Events</p>
+
+            @if (events.Any())
+            {
+                <div class="event-list">
+
+                    @foreach (var item in events)
+                    {
+                        var eventDateText = GetEventDate(item);
+
+                        <article class="event-card">
+
+                            <h2>@item.DisplayText</h2>
+
+                            @if (!string.IsNullOrWhiteSpace(eventDateText))
+                            {
+                                <p class="event-card__date">
+                                    @eventDateText
+                                </p>
+                            }
+
+                            <a class="button button--primary"
+                               href="/event/@item.ContentItemId">
+                                View Event
+                            </a>
+
+                        </article>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <p>There are currently no upcoming events.</p>
+            }
+
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container content-section__inner">
+
+            <div class="content-section__heading">
+                <p class="eyebrow">Your Event</p>
+            </div>
+
+            <div class="content-section__body">
+
+                <p>
+                    Interested in booking Dobcross Silver Band?
+                    Get in touch with the band to discuss availability
+                    and requirements.
+                </p>
+
+                <a class="button button--primary" href="/contact">
+                    Contact the Band
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section class="page-cta">
+        <div class="container page-cta__inner">
+
+            <div>
+                <p class="eyebrow">Dobcross Silver Band</p>
+                <h2>Keep exploring.</h2>
+            </div>
+
+            <div>
+                <a class="button button--primary" href="/">
+                    Return Home
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+</main>

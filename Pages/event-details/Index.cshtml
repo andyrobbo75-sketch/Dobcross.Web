@@ -1,0 +1,202 @@
+﻿@page "/event/{id}"
+
+@using OrchardCore
+@using System.Globalization
+@using System.Text.Json
+@using System.Text.Json.Nodes
+
+@inject IOrchardHelper Orchard
+
+@{
+    ViewData["Title"] = "Event";
+
+    var eventItem = await Orchard.GetContentItemByIdAsync(Id);
+
+    string? GetEventDate(OrchardCore.ContentManagement.ContentItem item)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(item.Content);
+            var root = JsonNode.Parse(json);
+
+            JsonNode? FindProperty(JsonNode? node, string propertyName)
+            {
+                if (node is JsonObject obj)
+                {
+                    foreach (var property in obj)
+                    {
+                        if (string.Equals(
+                            property.Key,
+                            propertyName,
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            return property.Value;
+                        }
+
+                        var found = FindProperty(property.Value, propertyName);
+
+                        if (found != null)
+                        {
+                            return found;
+                        }
+                    }
+                }
+                else if (node is JsonArray array)
+                {
+                    foreach (var child in array)
+                    {
+                        var found = FindProperty(child, propertyName);
+
+                        if (found != null)
+                        {
+                            return found;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            var dateNode = FindProperty(root, "EventDateTime");
+
+            if (dateNode == null)
+            {
+                return null;
+            }
+
+            string? raw = null;
+
+            // Orchard's DateTime field is stored as an object
+            // containing a "Value" property.
+            if (dateNode is JsonObject dateObject &&
+                dateObject.TryGetPropertyValue("Value", out var valueNode))
+            {
+                raw = valueNode?.ToString()?.Trim('"');
+            }
+            else
+            {
+                raw = dateNode.ToString()?.Trim('"');
+            }
+
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            if (DateTimeOffset.TryParse(
+                raw,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out var parsedDate))
+            {
+                return parsedDate
+                    .ToLocalTime()
+                    .ToString(
+                        "dddd d MMMM yyyy 'at' h:mm tt",
+                        CultureInfo.InvariantCulture);
+            }
+
+            return raw;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    string? eventDateText = null;
+    string? eventBody = null;
+
+    if (eventItem != null)
+    {
+        eventDateText = GetEventDate(eventItem);
+
+        if (eventItem.Content?.MarkdownBodyPart?.Markdown != null)
+        {
+            eventBody = eventItem.Content.MarkdownBodyPart.Markdown.ToString();
+        }
+    }
+}
+
+<main>
+
+    @if (eventItem == null)
+    {
+        <section class="page-hero">
+            <div class="container">
+
+                <p class="eyebrow">Dobcross Silver Band</p>
+
+                <h1>Event not found</h1>
+
+                <p class="page-hero__intro">
+                    The requested event could not be found.
+                </p>
+
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+
+                <a class="text-link" href="/events">
+                    ← Back to Events
+                </a>
+
+            </div>
+        </section>
+    }
+    else
+    {
+        <article class="event-detail">
+
+            <header class="page-hero">
+                <div class="container">
+
+                    <p class="eyebrow">
+                        Dobcross Silver Band
+                    </p>
+
+                    <h1>
+                        @eventItem.DisplayText
+                    </h1>
+
+                    @if (!string.IsNullOrWhiteSpace(eventDateText))
+                    {
+                        <p class="page-hero__intro">
+                            @eventDateText
+                        </p>
+                    }
+
+                </div>
+            </header>
+
+            <section class="content-section">
+                <div class="container">
+
+                    @if (!string.IsNullOrWhiteSpace(eventBody))
+                    {
+                        <div class="event-detail__body">
+                            @await Orchard.MarkdownToHtmlAsync(eventBody)
+                        </div>
+                    }
+
+                    <div class="event-detail__back">
+                        <a class="text-link" href="/events">
+                            ← Back to Events
+                        </a>
+                    </div>
+
+                </div>
+            </section>
+
+        </article>
+    }
+
+</main>
+
+@functions
+{
+    [FromRoute]
+    public string? Id { get; set; }
+}

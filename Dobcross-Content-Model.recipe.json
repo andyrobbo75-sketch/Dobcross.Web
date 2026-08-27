@@ -1,0 +1,329 @@
+﻿{
+  "name": "DobcrossContentModel",
+  "displayName": "Dobcross Silver Band Content Model",
+  "description": "Creates the content types used by the Dobcross Silver Band website.",
+  "author": "Dobcross Silver Band",
+  "website": "",
+  "version": "1.0.0",
+  "issetuprecipe": false,
+  "categories": [
+    "Dobcross Silver Band"
+  ],
+  "tags": [
+    "content",
+    "band",
+    "website"
+  ],
+  "steps": [
+    {
+      "name": "ContentDefinition",
+      "ContentTypes": [
+        {
+          "Name": "BandMember",
+          "DisplayName": "Band Member",
+          "Settings": {
+            "ContentTypeSettings": {
+              "Creatable": true,
+              "Listable": true,
+              "Draftable": true,
+              "Versionable": true,
+              "Securable": true
+            },
+            "FullTextAspectSettings": {
+              "IncludeFullTextTemplate": false,
+              "IncludeBodyAspect": true,
+              "IncludeDisplayText": true
+            }
+          },
+          "ContentTypePartDefinitionRecords": [
+            {
+              "PartName": "BandMember",
+              "Name": "BandMember",
+              "Settings": {}
+            },
+            {
+              "PartName": "AliasPart",
+              "Name": "AliasPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "MarkdownBodyPart",
+              "Name": "MarkdownBodyPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "TitlePart",
+              "Name": "TitlePart",
+              "Settings": {}
+            }
+          ]
+        },
+        {
+          "Name": "Gallery",
+          "DisplayName": "Gallery",
+          "Settings": {
+            "ContentTypeSettings": {
+              "Creatable": true,
+              "Listable": true,
+              "Draftable": true,
+              "Versionable": true,
+              "Securable": true
+            },
+            "FullTextAspectSettings": {
+              "IncludeFullTextTemplate": false,
+              "IncludeBodyAspect": true,
+              "IncludeDisplayText": true
+            }
+          },
+          "ContentTypePartDefinitionRecords": [
+            {
+              "PartName": "Gallery",
+              "Name": "Gallery",
+              "Settings": {}
+            },
+            {
+              "PartName": "AliasPart",
+              "Name": "AliasPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "MarkdownBodyPart",
+              "Name": "MarkdownBodyPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "TitlePart",
+              "Name": "TitlePart",
+              "Settings": {}
+            }
+          ]
+        },
+        {
+          "Name": "ContestResult",
+          "DisplayName": "Contest Result",
+          "Settings": {
+            "ContentTypeSettings": {
+              "Creatable": true,
+              "Listable": true,
+              "Draftable": true,
+              "Versionable": true,
+              "Securable": true
+            },
+            "FullTextAspectSettings": {
+              "IncludeFullTextTemplate": false,
+              "IncludeBodyAspect": true,
+              "IncludeDisplayText": true
+            }
+          },
+          "ContentTypePartDefinitionRecords": [
+            {
+              "PartName": "ContestResult",
+              "Name": "ContestResult",
+              "Settings": {}
+            },
+            {
+              "PartName": "AliasPart",
+              "Name": "AliasPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "MarkdownBodyPart",
+              "Name": "MarkdownBodyPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "TitlePart",
+              "Name": "TitlePart",
+              "Settings": {}
+            }
+          ]
+        },
+        {
+          "Name": "Vacancy",
+          "DisplayName": "Vacancy",
+          "Settings": {
+            "ContentTypeSettings": {
+              "Creatable": true,
+              "Listable": true,
+              "Draftable": true,
+              "Versionable": true,
+              "Securable": true
+            },
+            "FullTextAspectSettings": {
+              "IncludeFullTextTemplate": false,
+              "IncludeBodyAspect": true,
+              "IncludeDisplayText": true
+            }
+          },
+          "ContentTypePartDefinitionRecords": [
+            {
+              "PartName": "Vacancy",
+              "Name": "Vacancy",
+              "Settings": {}
+            },
+            {
+              "PartName": "AliasPart",
+              "Name": "AliasPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "MarkdownBodyPart",
+              "Name": "MarkdownBodyPart",
+              "Settings": {}
+            },
+            {
+              "PartName": "TitlePart",
+              "Name": "TitlePart",
+              "Settings": {}
+            }
+          ]
+        }
+      ],
+      "ContentParts": [
+        {
+          "Name": "BandMember",
+          "Settings": {
+            "ContentPartSettings": {
+              "Attachable": false,
+              "Reusable": false
+            }
+          },
+          "ContentPartFieldDefinitionRecords": [
+            {
+              "FieldName": "TextField",
+              "Name": "Instrument",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Instrument"
+                }
+              }
+            },
+            {
+              "FieldName": "TextField",
+              "Name": "Role",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Role"
+                }
+              }
+            },
+            {
+              "FieldName": "MediaField",
+              "Name": "Photo",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Photo"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Name": "Gallery",
+          "Settings": {
+            "ContentPartSettings": {
+              "Attachable": false,
+              "Reusable": false
+            }
+          },
+          "ContentPartFieldDefinitionRecords": [
+            {
+              "FieldName": "MediaField",
+              "Name": "Images",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Images"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Name": "ContestResult",
+          "Settings": {
+            "ContentPartSettings": {
+              "Attachable": false,
+              "Reusable": false
+            }
+          },
+          "ContentPartFieldDefinitionRecords": [
+            {
+              "FieldName": "DateField",
+              "Name": "ContestDate",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Contest Date"
+                }
+              }
+            },
+            {
+              "FieldName": "TextField",
+              "Name": "Contest",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Contest"
+                }
+              }
+            },
+            {
+              "FieldName": "TextField",
+              "Name": "Section",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Section"
+                }
+              }
+            },
+            {
+              "FieldName": "NumericField",
+              "Name": "Position",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Position"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Name": "Vacancy",
+          "Settings": {
+            "ContentPartSettings": {
+              "Attachable": false,
+              "Reusable": false
+            }
+          },
+          "ContentPartFieldDefinitionRecords": [
+            {
+              "FieldName": "TextField",
+              "Name": "Instrument",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Instrument / Position"
+                }
+              }
+            },
+            {
+              "FieldName": "DateField",
+              "Name": "ClosingDate",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Closing Date"
+                }
+              }
+            },
+            {
+              "FieldName": "TextField",
+              "Name": "Contact",
+              "Settings": {
+                "ContentPartFieldSettings": {
+                  "DisplayName": "Contact"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

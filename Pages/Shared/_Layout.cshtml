@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Dobcross Silver Band</title>
+
+    <meta name="description"
+          content="Dobcross Silver Band — established in 1875. Discover the band, latest news, events, results, history and gallery." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+
+    <link rel="stylesheet"
+          href="/css/site.css?v=@DateTime.UtcNow.Ticks" />
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <div class="site-header__inner">
+
+            <a class="site-brand"
+               href="/"
+               aria-label="Dobcross Silver Band home">
+
+                <img src="/images/dobx-logo.png"
+                     alt="Dobcross Silver Band"
+                     class="site-brand__logo" />
+
+            </a>
+
+            <button class="nav-toggle"
+                    type="button"
+                    aria-label="Open navigation"
+                    aria-expanded="false">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <nav class="site-nav"
+                 aria-label="Main navigation">
+
+                <a href="/">Home</a>
+                <a href="/about-the-band">About the Band</a>
+                <a href="/latest-news">Latest News</a>
+                <a href="/events">Events</a>
+                <a href="/gallery">Gallery</a>
+                <a href="/results">Results</a>
+                <a href="/history">History</a>
+                <a href="/contact">Contact</a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    @RenderBody()
+
+    <footer class="site-footer">
+
+        <div class="site-footer__inner">
+
+            <div class="site-footer__brand">
+
+                <img src="/images/dobx-logo.png"
+                     alt="Dobcross Silver Band"
+                     class="site-footer__logo" />
+
+            </div>
+
+            <div class="site-footer__links">
+
+                <a href="/about-the-band">About the Band</a>
+                <a href="/latest-news">Latest News</a>
+                <a href="/events">Events</a>
+                <a href="/gallery">Gallery</a>
+                <a href="/results">Results</a>
+                <a href="/history">History</a>
+                <a href="/contact">Contact</a>
+
+            </div>
+
+            <div class="site-footer__bottom">
+
+                <span>
+                    © @DateTime.Now.Year Dobcross Silver Band
+                </span>
+
+                <span>
+                    Established 1875 · Saddleworth
+                </span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="/js/site.js?v=@DateTime.UtcNow.Ticks"></script>
+
+</body>
+</html>
